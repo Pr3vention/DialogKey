@@ -225,7 +225,7 @@ function DialogKey:CreateOptionsFrame()		-- Constructs the options frame
 	additionalScroll.EditBox:SetMaxLetters(0)
 	additionalScroll.EditBox:SetWidth(additionalScroll:GetWidth())
 	additionalScroll.EditBox:Enable()
-	additionalScroll.EditBox:SetFont("Fonts\\ARIALN.TTF", 16)
+--	additionalScroll.EditBox:SetFont("Fonts\\ARIALN.TTF", 16)
 	
 	additionalScroll.EditBox:SetScript("OnEnterPressed", nil)
 	
@@ -291,7 +291,7 @@ function DialogKey:CreateOptionsFrame()		-- Constructs the options frame
 	blacklistScroll.EditBox:SetMaxLetters(0)
 	blacklistScroll.EditBox:SetWidth(blacklistScroll:GetWidth())
 	blacklistScroll.EditBox:Enable()
-	blacklistScroll.EditBox:SetFont("Fonts\\ARIALN.TTF", 16)
+	--blacklistScroll.EditBox:SetFont("Fonts\\ARIALN.TTF", 16)
 	
 	blacklistScroll.EditBox:SetScript("OnEnterPressed", nil)
 	
