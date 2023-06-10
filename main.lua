@@ -1,3 +1,6 @@
+--local references for fast lookup
+local gossipFrame = GossipFrame
+
 -- Chat handlers --
 function DialogKey:AddMouseFocus()				-- Adds the button under the cursor to the list of additional buttons to click
 	local frame = GetMouseFocus()
@@ -232,7 +235,7 @@ function DialogKey:ClickButtons()				-- Main function to click on dialog buttons
 			return false -- We're done handling the QuestTitleButton1 frame, so exit the function
 		
 		-- Workaround for selecting first COMPLETED quest, even if it's not the first gossip option
-		elseif framename == "GossipTitleButton1" and GossipFrame:IsVisible() then
+		elseif framename == "GossipTitleButton1" and gossipFrame:IsVisible() then
 			-- Try clicking the first gossip option with a completed quest icon -- also check if it's visible, since frames are reused and it might get stuck trying to click a leftover, invisible active quest button
 			for i=1,9 do
 				if _G["GossipTitleButton"..i.."GossipIcon"]:IsVisible() and (
@@ -364,64 +367,29 @@ end
 
 function DialogKey:EnumerateGossips_Gossip()	-- Prefixes 1., 2., etc. to NPC options
 	if not DialogKey.db.global.numKeysForGossip then return end
-	if not GossipFrameGreetingPanel:IsVisible() and not QuestFrameGreetingPanel:IsVisible() then return end
 	
-	local num = 1
-	for i=1,9 do
-		local frame
-		if GossipFrame:IsVisible() then
-			frame = _G["GossipTitleButton"..i]
-		else
-			frame = _G["QuestTitleButton"..i]
+	if not gossipFrame:IsVisible() and not gossipFrame:IsVisible() then return end
+	local provider = gossipFrame.GreetingPanel.ScrollBox:GetDataProvider()
+	
+	local inputCounter = 1
+	for i in ipairs(provider.collection) do
+		local infoField
+		
+		if provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_OPTION then
+			infoField = 'name'
+		elseif provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_ACTIVE_QUEST or provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_AVAILABLE_QUEST then
+			infoField = 'title'
 		end
 		
-		if frame:IsVisible() and frame:GetText() then
-			if not frame:GetText():find("^"..num.."\. ") then
-				frame:SetText(num .. ". " .. frame:GetText())
-			end
-			
-			num = num+1
-		end
-	end
-end
-
-function DialogKey:EnumerateGossips_Quest()		-- Prefixes 1., 2., etc. to NPC options
-	if not DialogKey.db.global.numKeysForGossip then return end
-	if not GossipFrameGreetingPanel:IsVisible() and not QuestFrameGreetingPanel:IsVisible() then return end
-	
-	local frames = DialogKey:GetQuestButtons()
-	
-	local num = 1
-	for i,f in pairs(frames) do
-		local frame = f.frame
-		if frame:IsVisible() and frame:GetText() then
-			if not frame:GetText():find("^"..num.."\. ") then
-				frame:SetText(num .. ". " .. frame:GetText())
-			end
-			
-			num = num+1
-		end
-	end
-	
-	--[[
-	local num = 1
-	for i=1,9 do
-		local frame
-		if GossipFrame:IsVisible() then
-			frame = _G["GossipTitleButton"..i]
-		else
-			frame = _G["QuestTitleButton"..i]
+		if infoField then
+			provider.collection[i].info[infoField] = inputCounter .. '. ' .. provider.collection[i].info[infoField]
+			inputCounter = inputCounter + 1
 		end
 		
-		if frame:IsVisible() and frame:GetText() then
-			if not frame:GetText():find("^"..num.."\. ") then
-				frame:SetText(num .. ". " .. frame:GetText())
-			end
-			
-			num = num+1
-		end
+		if inputCounter % 10 == 0 then break end
 	end
-	]]
+	
+	gossipFrame.GreetingPanel.ScrollBox:SetDataProvider(provider)
 end
 
 function DialogKey:Glow(frame, mode)			-- Show the glow frame over a frame. Mode is "click", "add", or "remove"

@@ -76,7 +76,6 @@ function DialogKey:OnInitialize()				-- Runs on addon initialization
 	self:RegisterChatCommand("dialogkey", "ChatCommand")
 	
 	self:RegisterEvent("GOSSIP_SHOW",		  function() self:ScheduleTimer(self.EnumerateGossips_Gossip, 0.01) end)
-	self:RegisterEvent("QUEST_GREETING",	  function() self:ScheduleTimer(self.EnumerateGossips_Quest, 0.01) end)
 	self:RegisterEvent("PLAYER_REGEN_ENABLED",function() self:ScheduleTimer(self.DisableQuestScrolling, 0.1) end) -- Since scrolling can't be disabled on closing a scrollframe in combat, wait til the end of combat to try disabling
 	
 	QuestInfoRewardsFrameQuestInfoItem1:HookScript("OnHide", function() GameTooltip:Hide() end) -- Hide GameTooltip when the quest is finished
