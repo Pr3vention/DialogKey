@@ -49,7 +49,7 @@ function DialogKey:CreateOptionsFrame()		-- Constructs the options frame
 	
 	local subtitle = optionsContent:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
 	subtitle:SetFont("Fonts\\FRIZQT__.TTF", 10)
-	subtitle:SetText("Version " .. GetAddOnMetadata("DialogKey","Version"))
+	subtitle:SetText("Version " .. C_AddOns.GetAddOnMetadata("DialogKey","Version"))
 	subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 4, -8)
 	
 	optionsContent.keybindButtons = {}

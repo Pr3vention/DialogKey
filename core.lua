@@ -113,7 +113,7 @@ function DialogKey:ChatCommand(input)			-- Chat command handler
 	local args = {strsplit(" ", input:trim())}
 	
 	if args[1] == "v" or args[1] == "ver" or args[1] == "version" then
-		DialogKey:Print(GAME_VERSION_LABEL..": |cffffd700"..GetAddOnMetadata("DialogKey","Version").."|r")
+		DialogKey:Print(GAME_VERSION_LABEL..": |cffffd700"..C_AddOns.GetAddOnMetadata("DialogKey","Version").."|r")
 	elseif args[1] == "add" or args[1] == "a" or args[1] == "watch" then
 		if args[2] then
 			DialogKey:WatchFrame(args[2])
