@@ -1,5 +1,5 @@
 --local references for fast lookup
-local gossipFrame = GossipFrame
+local gossipFrame, QuestFrame = GossipFrame, QuestFrame
 local C_GossipInfo = C_GossipInfo
 
 local gossipOptions = {}
@@ -148,14 +148,7 @@ function DialogKey:HandleKey(key)				-- Run for every key hit ever; runs ClickBu
 	if DialogKey.db.global.numKeysForGossip and key:find("^%d$") and (gossipFrame:IsVisible() or gossipFrame:IsVisible()) then
 		key = tonumber(key)
 		if gossipOptions[key] then
-			if gossipOptions[key].optionType == 'activeQuest' then
-				C_GossipInfo.SelectActiveQuest(gossipOptions[key].optionID)
-			elseif gossipOptions[key].optionType == 'availableQuest' then
-				C_GossipInfo.SelectAvailableQuest(gossipOptions[key].optionID)
-			else
-				C_GossipInfo.SelectOption(gossipOptions[key].optionID)
-			end
-			
+			pcall(gossipOptions[key].callback, gossipOptions[key].optionID)
 			self:SetPropagateKeyboardInput(false)
 			return
 		end
@@ -373,13 +366,13 @@ function DialogKey:EnumerateGossips_Gossip()	-- Prefixes 1., 2., etc. to NPC opt
 		
 		if provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_OPTION then
 			infoField = 'name'
-			option = { optionType = 'gossip' }
+			option = { callback = C_GossipInfo.SelectOption }
 		elseif provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_ACTIVE_QUEST then
 			infoField = 'title'
-			option = { optionType = 'activeQuest' }
+			option = { callback = C_GossipInfo.SelectActiveQuest }
 		elseif provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_AVAILABLE_QUEST then
 			infoField = 'title'
-			option = { optionType = 'availableQuest' }
+			option = { callback = C_GossipInfo.SelectAvailableQuest }
 		end
 		
 		if infoField then
