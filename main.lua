@@ -215,6 +215,10 @@ function DialogKey:ClickButtons()				-- Main function to click on dialog buttons
 		end
 	end
 	
+	if UnitIsDead("player") and not DialogKey.db.global.dontClickReleases then
+		RepopMe()
+	end
+	
 	--[[
 	for i,framename in pairs(DialogKey.buttons) do
 		-- Workaround for BFA: we can't select individual gossip frames anymore, so we have to use these functions instead
