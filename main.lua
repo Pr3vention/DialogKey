@@ -1,8 +1,16 @@
 --local references for fast lookup
-local gossipFrame, QuestFrame = GossipFrame, QuestFrame
+local gossipFrame, QuestFrame, QuestFrameAcceptButton = 
+	  GossipFrame, QuestFrame, QuestFrameAcceptButton
+	  
+--local API references
 local C_GossipInfo = C_GossipInfo
 
 local gossipOptions = {}
+local function executeGossipAction(index)
+	assert(gossipOptions and gossipOptions[index], 'DialogKey tried executing gossip action on unknown index: ' .. tostring(index))
+	pcall(gossipOptions[index].callback, gossipOptions[index].optionID)
+	table.wipe(gossipOptions)
+end
 
 -- Chat handlers --
 function DialogKey:AddMouseFocus()				-- Adds the button under the cursor to the list of additional buttons to click
@@ -148,7 +156,7 @@ function DialogKey:HandleKey(key)				-- Run for every key hit ever; runs ClickBu
 	if DialogKey.db.global.numKeysForGossip and key:find("^%d$") and (gossipFrame:IsVisible() or gossipFrame:IsVisible()) then
 		key = tonumber(key)
 		if gossipOptions[key] then
-			pcall(gossipOptions[key].callback, gossipOptions[key].optionID)
+			executeGossipAction(key)
 			self:SetPropagateKeyboardInput(false)
 			return
 		end
@@ -194,10 +202,19 @@ function DialogKey:HandleKey(key)				-- Run for every key hit ever; runs ClickBu
 end
 
 function DialogKey:ClickButtons()				-- Main function to click on dialog buttons when the bound key is pressed. Return true to mark the keypress as handled and block input (like jumping)
+	-- if player is on the GossipFrame and at least one option is present, always act on the first option
 	if gossipOptions and gossipOptions[1] then
-		pcall(gossipOptions[1].callback, gossipOptions[1].optionID)
+		executeGossipAction(1)
 		return true
 	end
+	
+	if QuestFrame and QuestFrame:IsVisible() then
+		if QuestFrameAcceptButton and QuestFrameAcceptButton:IsVisible() then
+			AcceptQuest()
+			return true
+		end
+	end
+	
 	--[[
 	for i,framename in pairs(DialogKey.buttons) do
 		-- Workaround for BFA: we can't select individual gossip frames anymore, so we have to use these functions instead
