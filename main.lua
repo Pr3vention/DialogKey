@@ -1,5 +1,8 @@
 --local references for fast lookup
 local gossipFrame = GossipFrame
+local C_GossipInfo = C_GossipInfo
+
+local gossipOptions = {}
 
 -- Chat handlers --
 function DialogKey:AddMouseFocus()				-- Adds the button under the cursor to the list of additional buttons to click
@@ -142,29 +145,21 @@ function DialogKey:HandleKey(key)				-- Run for every key hit ever; runs ClickBu
 	
 	if GetCurrentKeyBoardFocus() then return end -- Don't handle key if we're typing into something
 	
-	if key:find("^%d$") and (QuestFrameGreetingPanel:IsVisible() or GossipFrameGreetingPanel:IsVisible()) and DialogKey.db.global.numKeysForGossip then
-		local num = 1
-		local keynum = tonumber(key)
-		for i=1,9 do
-			local frame = _G["GossipTitleButton"..i]
-			
-			-- Try QuestTitleButton* instead if Gossip buttons aren't shown
-			if not frame or not frame:IsVisible() then
-				frame = _G["QuestTitleButton"..i]
+	if DialogKey.db.global.numKeysForGossip and key:find("^%d$") and (gossipFrame:IsVisible() or gossipFrame:IsVisible()) then
+		key = tonumber(key)
+		if gossipOptions[key] then
+			if gossipOptions[key].optionType == 'activeQuest' then
+				C_GossipInfo.SelectActiveQuest(gossipOptions[key].optionID)
+			elseif gossipOptions[key].optionType == 'availableQuest' then
+				C_GossipInfo.SelectAvailableQuest(gossipOptions[key].optionID)
+			else
+				C_GossipInfo.SelectOption(gossipOptions[key].optionID)
 			end
 			
-			-- If the frame isn't blank (blank frames are used to separate gossip and quests)
-			if frame and frame:IsVisible() and frame:GetText() then
-				if num == keynum then
-					DialogKey:ClickFrame(frame)
-					self:SetPropagateKeyboardInput(false)
-					return
-				end
-				
-				num = num+1
-			end
+			self:SetPropagateKeyboardInput(false)
+			return
 		end
-	
+		
 	-- If 1-9 was pressed, 'select quest rewards' option is enabled, quest rewards are visible, and the quest is ready to complete
 	elseif key:find("^%d$") and QuestInfoRewardsFrameQuestInfoItem1:IsVisible() and QuestFrameCompleteQuestButton:IsVisible() and DialogKey.db.global.numKeysForQuestRewards then
 		local frame = _G["QuestInfoRewardsFrameQuestInfoItem"..key]
@@ -366,6 +361,7 @@ function DialogKey:GetQuestButtons()			-- Return sorted list of quest button fra
 end
 
 function DialogKey:EnumerateGossips_Gossip()	-- Prefixes 1., 2., etc. to NPC options
+	table.wipe(gossipOptions)
 	if not DialogKey.db.global.numKeysForGossip then return end
 	
 	if not gossipFrame:IsVisible() and not gossipFrame:IsVisible() then return end
@@ -373,16 +369,23 @@ function DialogKey:EnumerateGossips_Gossip()	-- Prefixes 1., 2., etc. to NPC opt
 	
 	local inputCounter = 1
 	for i in ipairs(provider.collection) do
-		local infoField
+		local infoField, option
 		
 		if provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_OPTION then
 			infoField = 'name'
-		elseif provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_ACTIVE_QUEST or provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_AVAILABLE_QUEST then
+			option = { optionType = 'gossip' }
+		elseif provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_ACTIVE_QUEST then
 			infoField = 'title'
+			option = { optionType = 'activeQuest' }
+		elseif provider.collection[i].buttonType == GOSSIP_BUTTON_TYPE_AVAILABLE_QUEST then
+			infoField = 'title'
+			option = { optionType = 'availableQuest' }
 		end
 		
 		if infoField then
 			provider.collection[i].info[infoField] = inputCounter .. '. ' .. provider.collection[i].info[infoField]
+			option.optionID = provider.collection[i].info.gossipOptionID or provider.collection[i].info.questID
+			gossipOptions[inputCounter] = option
 			inputCounter = inputCounter + 1
 		end
 		
