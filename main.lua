@@ -194,6 +194,11 @@ function DialogKey:HandleKey(key)				-- Run for every key hit ever; runs ClickBu
 end
 
 function DialogKey:ClickButtons()				-- Main function to click on dialog buttons when the bound key is pressed. Return true to mark the keypress as handled and block input (like jumping)
+	if gossipOptions and gossipOptions[1] then
+		pcall(gossipOptions[1].callback, gossipOptions[1].optionID)
+		return true
+	end
+	--[[
 	for i,framename in pairs(DialogKey.buttons) do
 		-- Workaround for BFA: we can't select individual gossip frames anymore, so we have to use these functions instead
 		if framename == "QuestTitleButton1" and QuestFrame:IsVisible() then
@@ -240,7 +245,7 @@ function DialogKey:ClickButtons()				-- Main function to click on dialog buttons
 			return true
 		end
 	end
-	
+	]]--
 	for i,framename in pairs(self.db.global.additionalButtons) do
 		if DialogKey:ClickFrameName(framename) then
 			return true
