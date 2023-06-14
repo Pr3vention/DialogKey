@@ -212,6 +212,15 @@ function DialogKey:ClickButtons()				-- Main function to click on dialog buttons
 		if QuestFrameAcceptButton and QuestFrameAcceptButton:IsVisible() then
 			AcceptQuest()
 			return true
+		elseif QuestFrameCompleteButton and QuestFrameCompleteButton:IsVisible() then
+			CompleteQuest()
+			return true
+		elseif QuestFrameCompleteQuestButton and QuestFrameCompleteQuestButton:IsVisible() then
+			-- TODO: add support for choosing a quest reward using key binds. Maybe display the number near the item in the list?
+			if GetNumQuestChoices() <= 1 then
+				GetQuestReward(1)
+				return true
+			end
 		end
 	end
 	
