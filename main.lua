@@ -411,7 +411,7 @@ function DialogKey:EnumerateGossips_Gossip()	-- Prefixes 1., 2., etc. to NPC opt
 		end
 		
 		if infoField then
-			provider.collection[i].info[infoField] = inputCounter .. '. ' .. provider.collection[i].info[infoField]
+			provider.collection[i].info[infoField] = inputCounter .. '. ' .. provider.collection[i].info[infoField]:gsub("%d.%s+", '')
 			option.optionID = provider.collection[i].info.gossipOptionID or provider.collection[i].info.questID
 			gossipOptions[inputCounter] = option
 			inputCounter = inputCounter + 1
