@@ -289,7 +289,7 @@ end
 
 function DialogKey:ClickFrame(frame)			-- Attempts to click a passed frame
 	-- If the frame doesn't exist, definitely don't do anything (unless it's QuestTitleButton1, we handle that specially)
-	if not frame then
+	if not frame or (frame and not frame:IsVisible()) then
 		return false
 	end
 	
