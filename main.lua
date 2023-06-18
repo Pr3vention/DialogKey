@@ -459,8 +459,13 @@ end
 
 function DialogKey:GlowFrameUpdate(delta)		-- Fades out the glow frame
 	-- Use delta (time since last frame) so animation takes same amount of time regardless of framerate
-	self:SetAlpha(self:GetAlpha() - delta*3)
-	if self:GetAlpha() <= 0 then self:Hide() end
+	local newAlpha = self:GetAlpha() - delta*3
+	if newAlpha > 0 then
+		self:SetAlpha(newAlpha)
+	else
+		self:SetAlpha(0)
+		self:Hide()
+	end
 end
 
 -- Scroll functions --
