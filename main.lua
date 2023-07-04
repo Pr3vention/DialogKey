@@ -481,6 +481,7 @@ function DialogKey:EnableQuestScrolling()		-- Traps the mouse wheel input if the
 end
 
 function DialogKey:DisableQuestScrolling()		-- Frees up mouse wheel input again when a scroll frame is hidden, or when leaving combat
+	if InCombatLockdown() == 1 then return end
 	local found = false
 	
 	for i,frame in pairs(DialogKey.scrollFrames) do
