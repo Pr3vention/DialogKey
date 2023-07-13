@@ -151,6 +151,7 @@ function DialogKey:HandleKey(key)				-- Run for every key hit ever; runs ClickBu
 		return
 	end
 	
+	if InCombatLockdown() then return end -- keyboard input propagation can no longer be done while in combat as of 10.1.5
 	if GetCurrentKeyBoardFocus() then return end -- Don't handle key if we're typing into something
 	
 	if DialogKey.db.global.numKeysForGossip and key:find("^%d$") and (gossipFrame:IsVisible() or gossipFrame:IsVisible()) then
